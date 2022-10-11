@@ -13,7 +13,7 @@ const App = () => {
       alignItems='center'
       sx={{
         paddingBottom: 5,
-        backgroundImage: 'linear-gradient(to bottom, #11979c, #073d42 )',
+        backgroundImage: 'linear-gradient(to bottom, #11979c, #1d54ff )',
       }}
     >
       <Formulario />

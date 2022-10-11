@@ -6,6 +6,13 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
+  Typography,
+  CircularProgress,
 } from '@mui/material';
 import MaskedInput from "react-text-mask";
 
@@ -36,18 +43,17 @@ const ItemsFormulario = () => {
   });
 
 
-  const handlefillingOutForm = (item) => (event) => {
-    setDataForm({
-      ...dataForm,
-      [item]: event.target.value
-    });
-  }
+  const [dialogs, setDialogs] = useState({
+    consentForm: false,
+    sucess: false,
+    warning: false,
+  });
 
-  const handleSendData = () => {
-    console.log(dataForm)
-    console.log(validaForm)
-    console.log(checkboxItems)
-  }
+  const [flg_acordo, setFlg_acordo] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [returnMessage, setReturnMessage] = useState('');
+  const [alertMessageTitle, setAlertMessageTitle] = useState('Aviso!');
+  const [alertMessage, setAlertMessage] = useState('');
 
   const phoneNumberMask = [
     "(",
@@ -66,6 +72,94 @@ const ItemsFormulario = () => {
     /\d/,
     /\d/
   ];
+
+  const handlefillingOutForm = (item) => (event) => {
+    setDataForm({
+      ...dataForm,
+      [item]: event.target.value
+    });
+  }
+
+
+  const handleValidData = () => {
+    if (
+      dataForm.company === '' ||
+      dataForm.email === '' ||
+      dataForm.name === '' ||
+      dataForm.office === '' ||
+      dataForm.phone === ''
+    ) {
+      setDialogs({
+        ...dialogs,
+        warning: true
+      });
+      setAlertMessage('Preencha os dados obrigatórios')
+    } else if (
+      checkboxItems.ATUALIZACAO_DE_NORMAS === '0' &&
+      checkboxItems.ATUALIZACAO_FISCAL === '0' &&
+      checkboxItems.CONSULTORIA_EM_LGPD === '0' &&
+      checkboxItems.CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA === '0' &&
+      checkboxItems.INTERPRETACAO_JURIDICA === '0' &&
+      checkboxItems.PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO === '0'
+    ) {
+      setDialogs({
+        ...dialogs,
+        warning: true
+      });
+      setAlertMessage('Selecone ao menos uma produto')
+    } else {
+      setDialogs({ ...dialogs, consentForm: true })
+    }
+  }
+
+  const handleSendData = async () => {
+    let numsStr = dataForm.phone.replace(/[^0-9]/g, '');
+    let numeroDeWhatsapp = parseInt(numsStr);
+    let dados = {
+      nome: dataForm.name,
+      empresa: dataForm.company,
+      cargo: dataForm.office,
+      email: dataForm.email,
+      wpp: numeroDeWhatsapp,
+      PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO: checkboxItems.PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO,
+      CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA: checkboxItems.CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA,
+      ATUALIZACAO_DE_NORMAS: checkboxItems.ATUALIZACAO_DE_NORMAS,
+      INTERPRETACAO_JURIDICA: checkboxItems.INTERPRETACAO_JURIDICA,
+      ATUALIZACAO_FISCAL: checkboxItems.ATUALIZACAO_FISCAL,
+      CONSULTORIA_EM_LGPD: checkboxItems.CONSULTORIA_EM_LGPD,
+      flg_acordo: flg_acordo ? '1' : '0',
+    }
+    setDialogs({
+      ...dialogs,
+      sucess: true
+    });
+    setLoading(true);
+    await delay(3);
+    setReturnMessage('Você receberá um whatsapp com o seu número de sorteio e os dados sobre o sorteio… BOA SORTE !!!');
+    setLoading(false);
+
+    console.log(dados)
+  }
+
+  const finishSession = () => {
+    window.location.reload();
+  }
+
+  const handleOpenDialogs = (item) => (value) => {
+    setDialogs({
+      ...dialogs,
+      [item]: true
+    });
+  }
+
+  const handleCloseDialogs = (item) => (value) => {
+    setDialogs({
+      ...dialogs,
+      [item]: false
+    });
+  }
+
+  const delay = (tempo) => new Promise(r => setTimeout(r, tempo * 1000));
 
   return (
     <Grid
@@ -191,7 +285,7 @@ const ItemsFormulario = () => {
           <FormControlLabel
             control={
               <Checkbox
-                style={{ color: '#11979c' }}
+                style={{ color: '#1d54ff' }}
                 onChange={() => setCheckboxItems({ ...checkboxItems, PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO: checkboxItems.PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO === '0' ? '1' : '0' })}
               />
             }
@@ -200,7 +294,7 @@ const ItemsFormulario = () => {
           <FormControlLabel
             control={
               <Checkbox
-                style={{ color: '#11979c' }}
+                style={{ color: '#1d54ff' }}
                 onChange={() => setCheckboxItems({ ...checkboxItems, CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA: checkboxItems.CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA === '0' ? '1' : '0' })}
               />
             }
@@ -209,7 +303,7 @@ const ItemsFormulario = () => {
           <FormControlLabel
             control={
               <Checkbox
-                style={{ color: '#11979c' }}
+                style={{ color: '#1d54ff' }}
                 onChange={() => setCheckboxItems({ ...checkboxItems, ATUALIZACAO_DE_NORMAS: checkboxItems.ATUALIZACAO_DE_NORMAS === '0' ? '1' : '0' })}
               />
             }
@@ -218,7 +312,7 @@ const ItemsFormulario = () => {
           <FormControlLabel
             control={
               <Checkbox
-                style={{ color: '#11979c' }}
+                style={{ color: '#1d54ff' }}
                 onChange={() => setCheckboxItems({ ...checkboxItems, INTERPRETACAO_JURIDICA: checkboxItems.INTERPRETACAO_JURIDICA === '0' ? '1' : '0' })}
               />
             }
@@ -227,7 +321,7 @@ const ItemsFormulario = () => {
           <FormControlLabel
             control={
               <Checkbox
-                style={{ color: '#11979c' }}
+                style={{ color: '#1d54ff' }}
                 onChange={() => setCheckboxItems({ ...checkboxItems, ATUALIZACAO_FISCAL: checkboxItems.ATUALIZACAO_FISCAL === '0' ? '1' : '0' })}
               />
             }
@@ -236,7 +330,7 @@ const ItemsFormulario = () => {
           <FormControlLabel
             control={
               <Checkbox
-                style={{ color: '#11979c' }}
+                style={{ color: '#1d54ff' }}
                 onChange={() => setCheckboxItems({ ...checkboxItems, CONSULTORIA_EM_LGPD: checkboxItems.CONSULTORIA_EM_LGPD === '0' ? '1' : '0' })}
               />
             }
@@ -260,16 +354,130 @@ const ItemsFormulario = () => {
         >
           <Button
             sx={{
-              backgroundColor: '#11979c'
+              backgroundColor: '#1d54ff'
             }}
             variant="contained"
             fullWidth
-            onClick={handleSendData}
+            onClick={handleValidData}
           >
             Enviar
           </Button>
         </Grid>
       </Grid>
+
+      <Dialog
+        open={dialogs.consentForm}
+        onClose={handleCloseDialogs('consentForm')}
+      >
+        <DialogTitle>
+          Declaração de privacidade e proteção de dados pessoais
+        </DialogTitle>
+        <DialogContent>
+          <Grid
+            container
+            xs={12}
+          >
+            <Grid item>
+              <Typography variant='p' component='div'>
+                Coletamos seus dados com a finalidade de realizar promoções
+                e enviar informações ou realizar contato a respeito de nossas promoções,
+                produtos e serviços que realizamos.
+                Armazenamos seus dados pessoais de forma segura e não os compartilhamos com terceiros.
+                A qualquer tempo, você poderá solicitar seu descredenciamento ou
+                atualização de seus dados nas plataformas WhatsApp e e-mail Marketing
+                que utilizamos ou através do canal do titular, disponibilizado em
+                nosso site, em
+                <a
+                  style={{
+                    color: '#1d54ff',
+                    textDecoration: 'none',
+                  }}
+                  target="_blank"
+                  href='https://beelegal.com.br/'
+                >
+                  : beelegal.com.br
+                </a>
+              </Typography>
+            </Grid>
+            <Grid
+              container
+              item
+              justifyContent='center'
+              alignItems='center'
+              style={{ marginTop: 15 }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    style={{ color: '#1d54ff' }}
+                    checked={flg_acordo}
+                    onChange={() => setFlg_acordo(!flg_acordo)}
+                  />
+                }
+                label="Estou de acordo, desejo continuar"
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={handleCloseDialogs('consentForm')} style={{ color: '#fff', backgroundColor: '#f00' }} autoFocus>
+            Cancelar
+          </Button>
+          <Button disabled={!flg_acordo} variant="contained" onClick={handleSendData} style={{ color: '#fff', backgroundColor: flg_acordo ? '#1d54ff' : '#ccc' }} >
+            Enviar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={dialogs.sucess}
+        onClose={handleCloseDialogs('sucess')}
+      >
+        <DialogTitle>
+          {loading ? 'Salvando dados' : 'ATENÇÃO!'}
+        </DialogTitle>
+        <DialogContent>
+          {
+            loading ?
+              <Grid
+                container
+                justifyContent='center'
+                alignItems='center'
+                direction="column"
+              >
+                <DialogContentText >
+                  <CircularProgress style={{ color: '#1d54ff' }} />
+                </DialogContentText>
+              </Grid>
+              :
+              <DialogContentText >
+                {returnMessage}
+              </DialogContentText>
+          }
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={finishSession} style={{ display: loading ? 'none' : 'block', color: '#fff', backgroundColor: '#1d54ff' }} autoFocus >
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={dialogs.warning}
+        onClose={handleCloseDialogs('warning')}
+      >
+        <DialogTitle>
+          {alertMessageTitle}
+        </DialogTitle>
+        <DialogContent>
+          {alertMessage}
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={handleCloseDialogs('warning')} style={{ display: loading ? 'none' : 'block', color: '#fff', backgroundColor: '#1d54ff' }} autoFocus >
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
 
     </Grid>
   );

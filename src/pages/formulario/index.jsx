@@ -12,7 +12,7 @@ const Formulario = () => {
     <Grid
       container
       direction='column'
-      spacing={2}
+      // spacing={2}
       sx={{
         backgroundColor: '#fff',
         width: '90%',
