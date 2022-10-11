@@ -34,12 +34,12 @@ const ItemsFormulario = () => {
   })
 
   const [checkboxItems, setCheckboxItems] = useState({
-    PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO: '0',
-    CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA: '0',
-    ATUALIZACAO_DE_NORMAS: '0',
-    INTERPRETACAO_JURIDICA: '0',
-    ATUALIZACAO_FISCAL: '0',
-    CONSULTORIA_EM_LGPD: '0',
+    PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO: 0,
+    CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA: 0,
+    ATUALIZACAO_DE_NORMAS: 0,
+    INTERPRETACAO_JURIDICA: 0,
+    ATUALIZACAO_FISCAL: 0,
+    CONSULTORIA_EM_LGPD: 0,
   });
 
 
@@ -95,12 +95,12 @@ const ItemsFormulario = () => {
       });
       setAlertMessage('Preencha os dados obrigatórios')
     } else if (
-      checkboxItems.ATUALIZACAO_DE_NORMAS === '0' &&
-      checkboxItems.ATUALIZACAO_FISCAL === '0' &&
-      checkboxItems.CONSULTORIA_EM_LGPD === '0' &&
-      checkboxItems.CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA === '0' &&
-      checkboxItems.INTERPRETACAO_JURIDICA === '0' &&
-      checkboxItems.PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO === '0'
+      checkboxItems.ATUALIZACAO_DE_NORMAS === 0 &&
+      checkboxItems.ATUALIZACAO_FISCAL === 0 &&
+      checkboxItems.CONSULTORIA_EM_LGPD === 0 &&
+      checkboxItems.CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA === 0 &&
+      checkboxItems.INTERPRETACAO_JURIDICA === 0 &&
+      checkboxItems.PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO === 0
     ) {
       setDialogs({
         ...dialogs,
@@ -113,32 +113,57 @@ const ItemsFormulario = () => {
   }
 
   const handleSendData = async () => {
-    let numsStr = dataForm.phone.replace(/[^0-9]/g, '');
-    let numeroDeWhatsapp = parseInt(numsStr);
-    let dados = {
-      nome: dataForm.name,
-      empresa: dataForm.company,
-      cargo: dataForm.office,
-      email: dataForm.email,
-      wpp: numeroDeWhatsapp,
-      PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO: checkboxItems.PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO,
-      CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA: checkboxItems.CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA,
-      ATUALIZACAO_DE_NORMAS: checkboxItems.ATUALIZACAO_DE_NORMAS,
-      INTERPRETACAO_JURIDICA: checkboxItems.INTERPRETACAO_JURIDICA,
-      ATUALIZACAO_FISCAL: checkboxItems.ATUALIZACAO_FISCAL,
-      CONSULTORIA_EM_LGPD: checkboxItems.CONSULTORIA_EM_LGPD,
-      flg_acordo: flg_acordo ? '1' : '0',
-    }
     setDialogs({
       ...dialogs,
       sucess: true
     });
     setLoading(true);
-    await delay(3);
-    setReturnMessage('Você receberá um whatsapp com o seu número de sorteio e os dados sobre o sorteio… BOA SORTE !!!');
-    setLoading(false);
+    // await delay(3);
 
-    console.log(dados)
+    try {
+      let numsStr = dataForm.phone.replace(/[^0-9]/g, '');
+      let numeroDeWhatsapp = parseInt(numsStr);
+
+      let save = await fetch('https://apps.beelegal.com.br/juridico_one/Integration/Save', {
+        method: "POST",
+        headers: {
+          'Accept': "application/json",
+          'Content-Type': "application/json",
+          'auth': ''
+        },
+        body: JSON.stringify({
+          tid: "VF9NTUFCX0ZPUk06MDg2NzI4",
+          fid: 411,
+          data: {
+            nome: dataForm.name,
+            empresa: dataForm.company,
+            cargo: dataForm.office,
+            email: dataForm.email,
+            wpp: numeroDeWhatsapp,
+            PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO: checkboxItems.PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO,
+            CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA: checkboxItems.CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA,
+            ATUALIZACAO_DE_NORMAS: checkboxItems.ATUALIZACAO_DE_NORMAS,
+            INTERPRETACAO_JURIDICA: checkboxItems.INTERPRETACAO_JURIDICA,
+            ATUALIZACAO_FISCAL: checkboxItems.ATUALIZACAO_FISCAL,
+            CONSULTORIA_EM_LGPD: checkboxItems.CONSULTORIA_EM_LGPD,
+            flg_acordo: flg_acordo ? 1 : 0,
+          }
+        })
+      });
+
+      console.log(dataForm,checkboxItems,  flg_acordo)
+
+      let resSave = await save.json();
+      console.log('Resposta', resSave)
+      if (resSave.error) {
+        setReturnMessage(resSave.error.message);
+      } else {
+        setReturnMessage('Obrigado Você receberá um whatsapp com o seu número de sorteio e os dados sobre o sorteio… BOA SORTE !!!');
+      }
+    } catch (errorSaveData) {
+      console.log('error save data', errorSaveData)
+    }
+    setLoading(false);
   }
 
   const finishSession = () => {
@@ -286,7 +311,7 @@ const ItemsFormulario = () => {
             control={
               <Checkbox
                 style={{ color: '#1d54ff' }}
-                onChange={() => setCheckboxItems({ ...checkboxItems, PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO: checkboxItems.PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO === '0' ? '1' : '0' })}
+                onChange={() => setCheckboxItems({ ...checkboxItems, PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO: checkboxItems.PLANEJAMENTO_TRIBUTARIO_ESTRATEGICO === 0 ? 1 : 0 })}
               />
             }
             label="PLANEJAMENTO TRIBUTÁRIO ESTRATEGICO"
@@ -295,7 +320,7 @@ const ItemsFormulario = () => {
             control={
               <Checkbox
                 style={{ color: '#1d54ff' }}
-                onChange={() => setCheckboxItems({ ...checkboxItems, CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA: checkboxItems.CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA === '0' ? '1' : '0' })}
+                onChange={() => setCheckboxItems({ ...checkboxItems, CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA: checkboxItems.CUMPRIMENTO_DE_OBRIGACAO_ACESSORIA === 0 ? 1 : 0 })}
               />
             }
             label="CUMPRIMENTO DE OBRIGAÇÃO ACESSÓRIA"
@@ -304,7 +329,7 @@ const ItemsFormulario = () => {
             control={
               <Checkbox
                 style={{ color: '#1d54ff' }}
-                onChange={() => setCheckboxItems({ ...checkboxItems, ATUALIZACAO_DE_NORMAS: checkboxItems.ATUALIZACAO_DE_NORMAS === '0' ? '1' : '0' })}
+                onChange={() => setCheckboxItems({ ...checkboxItems, ATUALIZACAO_DE_NORMAS: checkboxItems.ATUALIZACAO_DE_NORMAS === 0 ? 1 : 0 })}
               />
             }
             label="ATUALIZAÇÃO DE NORMAS"
@@ -313,7 +338,7 @@ const ItemsFormulario = () => {
             control={
               <Checkbox
                 style={{ color: '#1d54ff' }}
-                onChange={() => setCheckboxItems({ ...checkboxItems, INTERPRETACAO_JURIDICA: checkboxItems.INTERPRETACAO_JURIDICA === '0' ? '1' : '0' })}
+                onChange={() => setCheckboxItems({ ...checkboxItems, INTERPRETACAO_JURIDICA: checkboxItems.INTERPRETACAO_JURIDICA === 0 ? 1 : 0 })}
               />
             }
             label="INTERPRETAÇÃO JURIDICA"
@@ -322,7 +347,7 @@ const ItemsFormulario = () => {
             control={
               <Checkbox
                 style={{ color: '#1d54ff' }}
-                onChange={() => setCheckboxItems({ ...checkboxItems, ATUALIZACAO_FISCAL: checkboxItems.ATUALIZACAO_FISCAL === '0' ? '1' : '0' })}
+                onChange={() => setCheckboxItems({ ...checkboxItems, ATUALIZACAO_FISCAL: checkboxItems.ATUALIZACAO_FISCAL === 0 ? 1 : 0 })}
               />
             }
             label="ATUALIZAÇÃO FISCAL"
@@ -331,7 +356,7 @@ const ItemsFormulario = () => {
             control={
               <Checkbox
                 style={{ color: '#1d54ff' }}
-                onChange={() => setCheckboxItems({ ...checkboxItems, CONSULTORIA_EM_LGPD: checkboxItems.CONSULTORIA_EM_LGPD === '0' ? '1' : '0' })}
+                onChange={() => setCheckboxItems({ ...checkboxItems, CONSULTORIA_EM_LGPD: checkboxItems.CONSULTORIA_EM_LGPD === 0 ? 1 : 0 })}
               />
             }
             label="CONSULTORIA EM LGPD "
@@ -414,7 +439,7 @@ const ItemsFormulario = () => {
                     onChange={() => setFlg_acordo(!flg_acordo)}
                   />
                 }
-                label="Estou de acordo, desejo continuar"
+                label="Estou de acordo, desejo continuar."
               />
             </Grid>
           </Grid>
