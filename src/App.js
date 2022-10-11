@@ -16,7 +16,7 @@ const App = () => {
         backgroundImage: 'linear-gradient(to bottom, #11979c, #1d54ff )',
       }}
     >
-      <Formulario />
+      <Formulario/>
     </Grid>
   );
 }
