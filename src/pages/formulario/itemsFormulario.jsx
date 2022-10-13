@@ -42,7 +42,6 @@ const ItemsFormulario = () => {
     CONSULTORIA_EM_LGPD: 0,
   });
 
-
   const [dialogs, setDialogs] = useState({
     consentForm: false,
     sucess: false,
